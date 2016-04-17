@@ -23,7 +23,7 @@ public class NewMessageActivity extends AppCompatActivity {
 
     private CheckBox encryptCheck, signatureCheck;
     private TextView msgLength;
-    private EditText recepientText, messageText, keyText;
+    private EditText recepientText, messageText, keyText, privateKeyText;
     private Button sendButton;
 
     @Override
@@ -31,6 +31,7 @@ public class NewMessageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_message);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Compose message");
         setSupportActionBar(toolbar);
 
         encryptCheck = (CheckBox) findViewById(R.id.encryptCheckBox);
@@ -55,15 +56,31 @@ public class NewMessageActivity extends AppCompatActivity {
             }
         });
         keyText = (EditText) findViewById(R.id.keyText);
+        privateKeyText = (EditText) findViewById(R.id.privateKeyText);
         sendButton = (Button) findViewById(R.id.sendButton);
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SmsManager sms = SmsManager.getDefault();
-                ArrayList<String> parts = sms.divideMessage(messageText.getText().toString());
-                sms.sendMultipartTextMessage(recepientText.getText().toString(), null, parts, null, null);
-                Log.d("SMS", "sending message to " + recepientText.getText().toString() + " " + messageText.getText().toString());
-                Toast.makeText(v.getContext(), "sending message", Toast.LENGTH_SHORT).show();
+                String messageBody = messageText.getText().toString();
+                String messageRecipient = recepientText.getText().toString();
+                if(messageRecipient.length()==0) {
+                    Toast.makeText(v.getContext(), "Fill the recipient number!", Toast.LENGTH_SHORT).show();
+                }
+                else if (messageBody.length()==0) {
+                    Toast.makeText(v.getContext(), "The message is empty!", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    if((encryptCheck.isChecked()&&keyText.getText().toString().length()==0)||(signatureCheck.isChecked()&&privateKeyText.getText().toString().length()==0)) {
+                        Toast.makeText(v.getContext(), "Fill the key field!", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        // PROSES ENKRIPSI DAN DIGITAL SIGNATURE
+                    }
+                    SmsManager sms = SmsManager.getDefault();
+                    ArrayList<String> parts = sms.divideMessage(messageBody);
+                    sms.sendMultipartTextMessage(messageRecipient, null, parts, null, null);
+                    Toast.makeText(v.getContext(), "Message sent", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="From : "
-        android:id="@+id/textView"
+        android:id="@+id/addressTextView"
         android:textSize="20dp"
         android:gravity="center_vertical"
         android:layout_alignParentTop="true"
@@ -42,7 +42,7 @@
         android:textSize="20dp"
         android:gravity="center_vertical"
         android:layout_marginTop="12dp"
-        android:layout_below="@+id/textView" />
+        android:layout_below="@+id/addressTextView" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -52,7 +52,7 @@
         android:gravity="center_vertical"
         android:layout_alignParentTop="true"
         android:layout_alignEnd="@+id/decryptButton"
-        android:layout_toEndOf="@+id/textView"
+        android:layout_toEndOf="@+id/addressTextView"
         android:layout_alignParentEnd="false"
         android:textAlignment="textEnd" />
 

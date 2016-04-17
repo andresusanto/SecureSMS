@@ -18,21 +18,23 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
         Bundle intentExtras = intent.getExtras();
         if (intentExtras != null) {
             Object[] sms = (Object[]) intentExtras.get(SMS_BUNDLE);
-            String smsMessageStr = "";
+            final SmsMessage[] messages = new SmsMessage[sms.length];
+            StringBuffer content = new StringBuffer();
+            String smsBody, smsSender = "";
             for (int i = 0; i < sms.length; ++i) {
-                SmsMessage smsMessage = SmsMessage.createFromPdu((byte[]) sms[i]);
-
-                String smsBody = smsMessage.getMessageBody().toString();
-                String address = smsMessage.getOriginatingAddress();
-
-                smsMessageStr += "SMS From: " + address + "\n";
-                smsMessageStr += smsBody + "\n";
+                messages[i] = SmsMessage.createFromPdu((byte[]) sms[i]);
+                content.append(messages[i].getMessageBody());
+                if(i==0)
+                    smsSender = messages[i].getOriginatingAddress();
             }
-            Toast.makeText(context, smsMessageStr, Toast.LENGTH_SHORT).show();
+            smsBody = content.toString();
+            Toast.makeText(context, "New message received!", Toast.LENGTH_SHORT).show();
 
             //this will update the UI with message
-            InboxActivity inst = InboxActivity.instance();
-            inst.updateList(smsMessageStr);
+            if(messages.length!=0) {
+                MainActivity inst = MainActivity.instance();
+                inst.updateList(smsSender, smsBody);
+            }
         }
     }
 }

@@ -6,9 +6,10 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,19 +22,19 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class InboxActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private final String INBOX = "inbox";
     private final String OUTBOX = "sent";
-    private static InboxActivity inst;
-    ArrayList<String> smsMessagesList = new ArrayList<String>();
-    ListView smsListView;
-    ArrayAdapter arrayAdapter;
+    private static MainActivity inst;
+    private List<Sms> smsList = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private SmsAdapter mAdapter;
 
     public void refreshSmsList(String option) {
         ContentResolver contentResolver = getContentResolver();
@@ -41,20 +42,22 @@ public class InboxActivity extends AppCompatActivity
         int indexBody = smsListCursor.getColumnIndex("body");
         int indexAddress = smsListCursor.getColumnIndex("address");
         if (indexBody < 0 || !smsListCursor.moveToFirst()) return;
-        arrayAdapter.clear();
+        smsList.clear();
+        mAdapter.notifyDataSetChanged();
         do {
-            String str = smsListCursor.getString(indexAddress) +
-                    "\n" + smsListCursor.getString(indexBody) + "\n";
-            arrayAdapter.add(str);
+            Sms sms = new Sms(smsListCursor.getString(indexAddress), smsListCursor.getString(indexBody), null);
+            smsList.add(sms);
         } while (smsListCursor.moveToNext());
+        mAdapter.notifyDataSetChanged();
     }
 
-    public void updateList(final String smsMessage) {
-        arrayAdapter.insert(smsMessage, 0);
-        arrayAdapter.notifyDataSetChanged();
+    public void updateList(final String smsSender, final String smsBody) {
+        Sms newSms = new Sms(smsSender, smsBody, null);
+        smsList.add(0,newSms);
+        mAdapter.notifyDataSetChanged();
     }
 
-    public static InboxActivity instance() {
+    public static MainActivity instance() {
         return inst;
     }
 
@@ -69,6 +72,7 @@ public class InboxActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inbox);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("SecureSMS - Inbox");
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -89,11 +93,14 @@ public class InboxActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        smsListView = (ListView) findViewById(R.id.SMSList);
-        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, smsMessagesList);
-        smsListView.setAdapter(arrayAdapter);
-        smsListView.setOnItemClickListener(this);
 
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mAdapter = new SmsAdapter(smsList);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
+        recyclerView.setAdapter(mAdapter);
         refreshSmsList(INBOX);
     }
 
@@ -139,32 +146,16 @@ public class InboxActivity extends AppCompatActivity
 
         if (id == R.id.nav_inbox) {
             refreshSmsList(INBOX);
+            mAdapter.isOutbox = false;
+            getSupportActionBar().setTitle("SecureSMS - Inbox");
         } else if (id == R.id.nav_outbox) {
             refreshSmsList(OUTBOX);
+            mAdapter.isOutbox = true;
+            getSupportActionBar().setTitle("SecureSMS - Outbox");
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        try {
-            String[] smsMessages = smsMessagesList.get(position).split("\n");
-            String address = smsMessages[0];
-            String smsMessage = "";
-            for (int i = 1; i < smsMessages.length; ++i) {
-                smsMessage += smsMessages[i];
-            }
-
-            Context context = view.getContext();
-            Intent intent = new Intent(context, MessageDetailActivity.class);
-            intent.putExtra(MessageDetailActivity.SENDER,address);
-            intent.putExtra(MessageDetailActivity.BODY,smsMessage);
-            context.startActivity(intent);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

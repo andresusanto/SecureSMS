@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
@@ -42,7 +43,7 @@ public class InboxActivity extends AppCompatActivity
         if (indexBody < 0 || !smsListCursor.moveToFirst()) return;
         arrayAdapter.clear();
         do {
-            String str = "SMS From: " + smsListCursor.getString(indexAddress) +
+            String str = smsListCursor.getString(indexAddress) +
                     "\n" + smsListCursor.getString(indexBody) + "\n";
             arrayAdapter.add(str);
         } while (smsListCursor.moveToNext());
@@ -122,6 +123,8 @@ public class InboxActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SignatureActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -138,10 +141,6 @@ public class InboxActivity extends AppCompatActivity
             refreshSmsList(INBOX);
         } else if (id == R.id.nav_outbox) {
             refreshSmsList(OUTBOX);
-        } else if (id == R.id.nav_signature) {
-
-        } else if (id == R.id.nav_encryption) {
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -159,9 +158,11 @@ public class InboxActivity extends AppCompatActivity
                 smsMessage += smsMessages[i];
             }
 
-            String smsMessageStr = address + "\n";
-            smsMessageStr += smsMessage;
-            Toast.makeText(this, smsMessageStr, Toast.LENGTH_SHORT).show();
+            Context context = view.getContext();
+            Intent intent = new Intent(context, MessageDetailActivity.class);
+            intent.putExtra(MessageDetailActivity.SENDER,address);
+            intent.putExtra(MessageDetailActivity.BODY,smsMessage);
+            context.startActivity(intent);
         } catch (Exception e) {
             e.printStackTrace();
         }

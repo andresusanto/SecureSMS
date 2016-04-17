@@ -14,19 +14,18 @@
         android:layout_height="wrap_content"
         android:text="Encrypt"
         android:id="@+id/encryptCheckBox"
-        android:layout_marginBottom="145dp"
         android:checked="false"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/keyText"
+        android:layout_alignParentLeft="true" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/keyText"
-        android:layout_marginTop="29dp"
-        android:layout_alignTop="@+id/encryptCheckBox"
+        android:layout_above="@+id/signatureCheckBox"
         android:layout_alignParentStart="true"
-        android:layout_alignEnd="@+id/recepientText" />
+        android:layout_alignParentEnd="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -59,21 +58,12 @@
         android:layout_below="@+id/recepientView"
         android:layout_alignParentStart="true" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/messageText"
-        android:layout_below="@+id/textView2"
-        android:layout_alignParentStart="true"
-        android:layout_alignEnd="@+id/recepientText"
-        android:layout_above="@+id/encryptCheckBox" />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Send"
         android:id="@+id/sendButton"
-        android:layout_below="@+id/keyText"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
     <TextView
@@ -84,5 +74,34 @@
         android:id="@+id/msgLength"
         android:layout_below="@+id/recepientText"
         android:layout_alignParentEnd="true" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Use Signature"
+        android:id="@+id/signatureCheckBox"
+        android:checked="false"
+        android:layout_above="@+id/privateKeyText"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/privateKeyText"
+        android:layout_above="@+id/sendButton"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:ems="10"
+        android:id="@+id/messageText"
+        android:layout_below="@+id/textView2"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/encryptCheckBox"
+        android:layout_alignParentEnd="true"
+        android:gravity="bottom" />
 
 </RelativeLayout>

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 public class NewMessageActivity extends AppCompatActivity {
 
-    private CheckBox encryptCheck;
+    private CheckBox encryptCheck, signatureCheck;
     private TextView msgLength;
     private EditText recepientText, messageText, keyText;
     private Button sendButton;
@@ -34,6 +34,7 @@ public class NewMessageActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         encryptCheck = (CheckBox) findViewById(R.id.encryptCheckBox);
+        signatureCheck = (CheckBox) findViewById(R.id.signatureCheckBox);
         msgLength = (TextView) findViewById(R.id.msgLength);
         recepientText = (EditText) findViewById(R.id.recepientText);
         messageText = (EditText) findViewById(R.id.messageText);

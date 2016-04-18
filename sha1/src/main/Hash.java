@@ -23,11 +23,12 @@ public class Hash {
     {
         byte [] message_byte = _message.getBytes();
         this.message = Tools.convertToBoolArray(message_byte);
+        this.initialize();
     }
     
     private void initialize()
     {
-        this.message_mod512 = new boolean[this.message.length / 512 + 1];
+        this.message_mod512 = new boolean[(this.message.length / 512 + 1) * 512];
         for (int i = 0; i < this.message_mod512.length; i++) {
             this.message_mod512[i] = false;
         }

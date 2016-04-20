@@ -1,4 +1,4 @@
-package id.ac.itb.securesms;
+package id.ac.itb.securesms.app;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -11,6 +11,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import id.ac.itb.securesms.R;
 
 public class MessageDetailActivity extends AppCompatActivity {
 

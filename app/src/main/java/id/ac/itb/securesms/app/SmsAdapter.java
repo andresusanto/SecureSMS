@@ -1,4 +1,4 @@
-package id.ac.itb.securesms;
+package id.ac.itb.securesms.app;
 
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
+
+import id.ac.itb.securesms.R;
 
 /**
  * Created by Rakhmatullah Yoga S on 17/04/2016.

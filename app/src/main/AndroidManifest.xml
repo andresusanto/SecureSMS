@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name=".app.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
@@ -25,7 +25,7 @@
         </activity>
 
         <receiver
-            android:name=".SmsBroadcastReceiver"
+            android:name=".app.SmsBroadcastReceiver"
             android:exported="true" >
             <intent-filter android:priority="999" >
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
@@ -33,16 +33,16 @@
         </receiver>
 
         <activity
-            android:name=".NewMessageActivity"
+            android:name=".app.NewMessageActivity"
             android:label="@string/title_activity_new_message"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
         <activity
-            android:name=".SignatureActivity"
+            android:name=".app.SignatureActivity"
             android:label="@string/title_activity_signature"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
-        <activity android:name=".MessageDetailActivity" >
+        <activity android:name=".app.MessageDetailActivity" >
         </activity>
     </application>
 

@@ -1,4 +1,4 @@
-package id.ac.itb.securesms;
+package id.ac.itb.securesms.app;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import id.ac.itb.securesms.R;
 import id.ac.itb.securesms.spec.ECCSpec;
 import id.ac.itb.securesms.spec.TreeCipherSpec;
 

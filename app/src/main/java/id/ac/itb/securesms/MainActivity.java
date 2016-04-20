@@ -26,6 +26,8 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
+import id.ac.itb.securesms.obj.Spec;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -102,6 +104,9 @@ public class MainActivity extends AppCompatActivity
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
         refreshSmsList(INBOX);
+
+        // untuk ngetes2 coy
+        Spec.testDSA();
     }
 
     @Override

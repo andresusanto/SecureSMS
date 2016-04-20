@@ -20,11 +20,16 @@ public class ECC {
     private BigInteger privateKey;
 
 
-    public ECC (Curve curve, Coordinate base, BigInteger privateKey) throws NoSuchAlgorithmException{
+    public ECC (Curve curve, Coordinate base, BigInteger privateKey){
         this.curve = curve;
         this.baseCoordinate = base;
         this.privateKey = privateKey;
-        hash = MessageDigest.getInstance("SHA-1");
+
+        try {
+            hash = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
     public Coordinate generatePublic(){
@@ -37,13 +42,8 @@ public class ECC {
         BigInteger s = new BigInteger(Arrays.copyOfRange(signature, signature.length/2, signature.length));
         BigInteger e = calculateE(curve.n, message);
 
-        System.out.println("R' : " + r.toString());
-        System.out.println("S' : " + s.toString());
-
         if (r.compareTo(BigInteger.ONE) < 0 || r.compareTo(curve.n) >= 0) return false; // r berada di [1, p - 1]
         if (s.compareTo(BigInteger.ONE) < 0 || s.compareTo(curve.n) >= 0) return false; // s berada di [1, p - 1]
-
-        System.out.println("OKE");
 
         BigInteger w = s.modInverse(curve.n);
 
@@ -52,14 +52,12 @@ public class ECC {
 
         Coordinate curvePoint = addCoordinate( multiplyCoordinate(this.baseCoordinate, u1), multiplyCoordinate(publicKey, u2) );
 
-        System.out.println("X : " + curvePoint.X.mod(curve.n).toString());
-
         return r.equals(curvePoint.X.mod(curve.n));
     }
 
     // fungsi untuk menghasilkan digital signature
     // ukuran signature yang dihasilkan adalah 2 x ukuran P (dalam byte)
-    public byte[] sign(byte[] input) throws IOException{
+    public byte[] sign(byte[] input){
         BigInteger e = calculateE(curve.n, input);
 
         BigInteger r, s;

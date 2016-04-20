@@ -1,8 +1,12 @@
 package id.ac.itb.securesms.obj;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
-
+/**
+ *
+ * @author Andre
+ */
 public class Coordinate {
     public BigInteger X;
     public BigInteger Y;
@@ -11,6 +15,24 @@ public class Coordinate {
     public Coordinate(BigInteger X, BigInteger Y){
         this.X = X;
         this.Y = Y;
+    }
+
+    public boolean isZero(){
+        return this.X.equals(BigInteger.ZERO) && this.Y.equals(BigInteger.ZERO);
+    }
+
+    public Coordinate(BigInteger X, BigInteger Y, Curve curve){
+        this.X = X;
+        this.Y = Y;
+
+        BigInteger ppodbf = curve.p.add(BigInteger.ONE).shiftRight(2);
+        BigInteger nY = this.X.multiply(X).add(curve.a).multiply(this.X).add(curve.b).modPow(ppodbf, curve.p); // hitung y
+
+        if (!nY.equals(this.Y) && !this.Y.equals(curve.p.subtract(nY))){
+            System.out.println("ERR");
+        }
+
+
     }
 
     public boolean isEqual(Coordinate other){
@@ -38,32 +60,29 @@ public class Coordinate {
         this.Y = new BigInteger(other.Y.toString());
     }
 
+    private void calculateY(Curve curve, boolean isNegative){
+        BigInteger ppodbf = curve.p.add(BigInteger.ONE).shiftRight(2);
+        this.Y = this.X.multiply(X).add(curve.a).multiply(this.X).add(curve.b).modPow(ppodbf, curve.p); // hitung y
+
+        if (this.Y.testBit(0) != isNegative){
+            this.Y = curve.p.subtract(this.Y);
+        }
+    }
+
+    public Coordinate(BigInteger X, Curve curve, boolean isNegative){
+        this.X = X;
+        calculateY(curve, isNegative);
+    }
+
     // buat titik dari byte. Proses encode byte ke titik dilakukan disini. Masih belom FIX Ukurannya (bisa jadi 1 point butuh 2 ato lebih byte)
     // ada parameter tambahan k (dr paper) yg gue gak tau itu masukan pengguna atau random atau gimana
-    public Coordinate(byte data, Curve curve){
-        int charCode = data & 0xFF;
-        boolean foundPoint = false;
-        BigInteger a = curve.a;//new BigInteger("-1");
-        BigInteger b = curve.b;//new BigInteger("188");
-        BigInteger p = curve.p;//new BigInteger("751");
-        BigInteger m = new BigInteger(""+charCode);
-        BigInteger x,y,y2;
+    public Coordinate(byte[] data, Curve curve) throws IOException{
+        if (data.length != curve.pLength + 1) throw new IOException("Invalid bytes length");
+        boolean isNegative = (data[0] != 0);
+        data[0] = 0; // byte yang digunakan untuk menyimpan sign
 
-        BigInteger i = new BigInteger("1");
-        while(i.compareTo(K)==-1 && !foundPoint) {
-            x = K.multiply(m).add(i);
-            y2 = x.pow(3).add(a.multiply(x)).add(b).mod(p);
-//            System.out.println(x.pow(3).add(a.multiply(x)).add(b));
-            if(y2.modPow(p.subtract(new BigInteger("1")).divide(new BigInteger("2")), p).compareTo(new BigInteger("1"))==0) {
-                y = y2.modPow(p.add(new BigInteger("1")).divide(new BigInteger("4")), p);
-                foundPoint = true;
-                this.X = x;
-                this.Y = y;
-            } else {
-                i = i.add(new BigInteger("1"));
-            }
-        }
-//        System.out.println("X:"+this.X+" Y:"+this.Y);
+        this.X = new BigInteger(data);
+        calculateY(curve, isNegative);
     }
 
     public BigInteger squareRoot(BigInteger num) {
@@ -89,7 +108,13 @@ public class Coordinate {
     }
 
     // menghasilkan byte dari titik. Proses decode dilakukan disini. Masih belom FIX Ukurannya (bisa jadi 1 point butuh 2 ato lebih byte)
-    public byte toByte(){
-        return (this.X.subtract(new BigInteger("1"))).divide(this.K).byteValue();
+    public byte[] toByte(Curve curve){
+        byte data[] = new byte[curve.pLength + 1];
+        byte xBytes[] = this.X.toByteArray();
+        System.arraycopy(xBytes, 0, data, data.length - xBytes.length, xBytes.length);
+
+        if (this.Y.testBit(0)) data[0] = 1; // simpan sign Y
+        return data;
+
     }
 }

@@ -19,14 +19,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import id.ac.itb.securesms.obj.Spec;
+import id.ac.itb.securesms.spec.ECCSpec;
+import id.ac.itb.securesms.spec.TreeCipherSpec;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -105,8 +104,16 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setAdapter(mAdapter);
         refreshSmsList(INBOX);
 
-        // untuk ngetes2 coy
-        Spec.testDSA();
+        // sampel ecc
+        ECCSpec.testDSA();
+
+        // sampel tree cipher block
+        try {
+            TreeCipherSpec.testTreeCipher();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

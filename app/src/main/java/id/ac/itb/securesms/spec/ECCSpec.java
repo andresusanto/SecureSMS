@@ -1,4 +1,4 @@
-package id.ac.itb.securesms.obj;
+package id.ac.itb.securesms.spec;
 
 import android.util.Base64;
 import android.util.Log;
@@ -8,11 +8,13 @@ import java.util.Random;
 
 import id.ac.itb.securesms.engine.ECC;
 import id.ac.itb.securesms.engine.Tools;
+import id.ac.itb.securesms.obj.Coordinate;
+import id.ac.itb.securesms.obj.Curve;
 
 /**
  * Created by Andre on 4/21/2016.
  */
-public class Spec {
+public class ECCSpec {
     // contoh konfigurasi kurva
     public static BigInteger a = new BigInteger("DB7C2ABF62E35E668076BEAD2088", 16);
     public static BigInteger b = new BigInteger("659EF8BA043916EEDE8911702B22", 16);
@@ -26,6 +28,7 @@ public class Spec {
 
 
     public static void testDSA(){
+        Log.d("SPEC", "================================== TESTING ECDSA =============================");
         Curve curve = new Curve(a, b, p, n);
         ECC ecc = new ECC(curve, base, privateKey);
 
@@ -43,7 +46,7 @@ public class Spec {
         // tampilkan signature
         Tools.printBytes(signature, "Signature");
         String base64 = Base64.encodeToString(signature, Base64.DEFAULT);
-        Log.d("Dalam Base64",base64);
+        Log.d("Dalam Base64", base64);
         byte signdecode[] = Base64.decode(base64, Base64.DEFAULT);
 
         Tools.printBytes(signdecode, "Signature decode");

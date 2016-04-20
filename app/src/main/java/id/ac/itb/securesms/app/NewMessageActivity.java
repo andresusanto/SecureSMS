@@ -1,4 +1,4 @@
-package id.ac.itb.securesms;
+package id.ac.itb.securesms.app;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,6 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+
+import id.ac.itb.securesms.R;
 
 public class NewMessageActivity extends AppCompatActivity {
 

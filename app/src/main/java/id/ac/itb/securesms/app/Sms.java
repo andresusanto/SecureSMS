@@ -1,4 +1,4 @@
-package id.ac.itb.securesms;
+package id.ac.itb.securesms.app;
 
 /**
  * Created by Rakhmatullah Yoga S on 17/04/2016.

@@ -1,4 +1,4 @@
-package id.ac.itb.securesms;
+package id.ac.itb.securesms.app;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -19,12 +19,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import id.ac.itb.securesms.R;
+import id.ac.itb.securesms.spec.ECCSpec;
+import id.ac.itb.securesms.spec.TreeCipherSpec;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -102,6 +104,17 @@ public class MainActivity extends AppCompatActivity
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
         refreshSmsList(INBOX);
+
+        // sampel ecc
+        ECCSpec.testDSA();
+
+        // sampel tree cipher block
+        try {
+            TreeCipherSpec.testTreeCipher();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

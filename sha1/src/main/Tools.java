@@ -5,24 +5,98 @@
  */
 package main;
 
-import java.awt.BorderLayout;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
-/**
- *
- * @author Andre
- */
 public class Tools {
     
+    public static byte [] getShuffled(String strSeed, byte [] data)
+    {
+        // bentuk seed untuk random
+        long seed = 0;
+        for (int i = 0; i < strSeed.length(); i++)
+            seed += (long)strSeed.charAt(i);
+        
+        List <Boolean> arrToShuffle = Tools.byteToBool(data);
+        Collections.shuffle(arrToShuffle, new Random(seed));
+        return Tools.boolToByte(arrToShuffle);
+    }
+    
+    /**
+     * Melakukan bit shift terhadap array of byte
+     * @param input array of byte yang akan di shift
+     * @param count banyaknya jumlah shift yang dilakukan
+     * @return 
+     */
+    public static byte[] shiftLeft(byte [] input, int count){
+        boolean [] inputbit = Tools.convertToBoolArray(input);
+        boolean [] left = new boolean[count];
+        
+        // simpan bit kiri yang akan dipindahkan ke paling belakang
+        System.arraycopy(inputbit, 0, left, 0, count);
+        
+        // geser bit ke kiri sebanyak count
+        int idx = 0;
+        for(int i = count; i < inputbit.length; i++)
+        {
+            inputbit[idx] = inputbit[i];
+            idx++;
+        }
+        System.arraycopy(left, 0, inputbit, inputbit.length - count, left.length);
+        return Tools.convertToByte(inputbit);
+    }
+    
+    public static boolean [] shiftLeft(boolean [] inputbit, int count){
+        boolean [] left = new boolean[count];
+        
+        // simpan bit kiri yang akan dipindahkan ke paling belakang
+        System.arraycopy(inputbit, 0, left, 0, count);
+        
+        // geser bit ke kiri sebanyak count
+        int idx = 0;
+        for(int i = count; i < inputbit.length; i++)
+        {
+            inputbit[idx] = inputbit[i];
+            idx++;
+        }
+        System.arraycopy(left, 0, inputbit, inputbit.length - count, left.length);
+        return inputbit;
+    }
+    
+    /**
+     * Melakukan bit shift terhadap array of byte
+     * @param input array of byte yang akan di shift
+     * @param count banyaknya jumlah shift yang dilakukan
+     * @return 
+     */
+    public static byte[] shiftRight(byte [] input, int count){
+        boolean [] inputbit = Tools.convertToBoolArray(input);
+        boolean [] Right = new boolean[count];
+        
+        // simpan bit kanan yang akan dipindahkan ke paling belakang
+        System.arraycopy(inputbit, inputbit.length - count, Right, 0, count);
+        
+        // geser bit ke kanan sebanyak count, yang digeser inputbit.length - count
+        int idx = count;
+        for(int i = inputbit.length - 1; i >= count; i--)
+        {
+            inputbit[i] = inputbit[i - idx];
+        }
+        
+        System.arraycopy(Right, 0, inputbit, 0, Right.length);
+        return Tools.convertToByte(inputbit);
+    }
+    
+    /**
+     * Mendapatkan value random dari seed yang berupa string tertentu
+     * @param strSeed
+     * @param min
+     * @param max
+     * @return 
+     */
     public static int[] getShuffledInts(String strSeed, int min, int max){
         // bentuk seed untuk random
         long seed = 0;
@@ -49,6 +123,30 @@ public class Tools {
     // Konversi Boolean >< Byte
     public static boolean[] convertToBoolArray(byte[] bytes) {
         return Tools.convert(bytes, bytes.length * 8);
+    }
+    
+    public static List<Boolean> byteToBool(byte [] key) {
+        List<Boolean> bList = new ArrayList<>();
+        for(int x=0; x<key.length; x++) {
+            boolean bit;
+            byte c= key[x];
+            for(int i=0; i<8; i++) {
+                bit = (c & (1 << 7-i))!=0;
+                bList.add(bit);
+            }
+        }
+        return bList;
+    }
+    
+    public static byte [] boolToByte(List <Boolean> bool)
+    {
+        byte[] data = new byte[(int)bool.size()/8];
+        for(int i=0; i<data.length; i++) {
+            data[i] = 0;
+            for(int j=0; j<8; j++)
+                data[i] += ((bool.get(i*8+j)? 1:0) << (7-j));
+        }
+        return data;
     }
     
     public static byte[] convertToByte(boolean[] booleanOfData) {
@@ -120,8 +218,7 @@ public class Tools {
         return bytes[0] << 24 | (bytes[1] & 0xFF) << 16 | (bytes[2] & 0xFF) << 8 | (bytes[3] & 0xFF);
     }
     
-    public static String bytesToString(byte [] bytes)
-    {
+    public static String bytesToString(byte [] bytes) {
         return new String(bytes);
     }
     
@@ -150,5 +247,4 @@ public class Tools {
         }
         return result;
     }
-    
 }

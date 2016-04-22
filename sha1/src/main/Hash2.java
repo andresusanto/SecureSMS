@@ -5,6 +5,8 @@
  */
 package main;
 
+import object.Word;
+
 /**
  *
  * @author akhfa
@@ -20,6 +22,8 @@ public class Hash2 {
     private static final int k1 = 0x6ED9EBA1;
     private static final int k2 = 0x8F1BBCDC;
     private static final int k3 = 0xCA62C1D6;
+    
+    int A, B, C, D, E;
     
     private byte [] paddingData(byte [] data)
     {
@@ -50,6 +54,27 @@ public class Hash2 {
         System.err.println(this.bytesToHexString(data));
         return hasil;
     }
+    
+    private void blockProcessing(byte [] chunk)
+    {
+        boolean [] chunkBoolean = Tools.convertToBoolArray(chunk);
+        Word [] words = new Word[80];
+        
+        // pecah 1 chunk jadi 16 word dari word 0 - 15
+        for(int i = 0; i < 16; i++)
+        {
+            boolean [] word = new boolean[32];
+            System.arraycopy(chunkBoolean, i * Word.WORD_SIZE, word, 0, Word.WORD_SIZE);
+        }
+        
+        // Buat word dari 16 - 79
+        for(int i = 16; i < 80; i++)
+        {
+            Word newWord = words[i - 3].xor(words[i - 8]).xor(words[i-14]).xor(words[i-16]).rotateLeft(1);
+            words [i] = newWord;
+        }
+    }
+    
     public static void main(String[] args) {
         Hash2 hash = new Hash2();
         hash.paddingData("a".getBytes());

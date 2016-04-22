@@ -5,8 +5,6 @@
  */
 package main;
 
-import object.Word;
-
 /**
  *
  * @author akhfa
@@ -18,10 +16,10 @@ public class Hash2 {
     private int h3 = 0x10325476;
     private int h4 = 0xC3D2E1F0;
     
-    private static final int k0 = 0x5A827999;
-    private static final int k1 = 0x6ED9EBA1;
-    private static final int k2 = 0x8F1BBCDC;
-    private static final int k3 = 0xCA62C1D6;
+    private static final int K0 = 0x5A827999;
+    private static final int K1 = 0x6ED9EBA1;
+    private static final int K2 = 0x8F1BBCDC;
+    private static final int K3 = 0xCA62C1D6;
     
     int A, B, C, D, E, F;
     
@@ -37,7 +35,7 @@ public class Hash2 {
             this.blockProcessing(chunk);
         }
         
-        return Integer.toHexString(h0) + Integer.toHexString(h1) + Integer.toHexString(h2) + Integer.toHexString(h3);
+        return integerToHexString(h0) + integerToHexString(h1) + integerToHexString(h2) + integerToHexString(h3) + integerToHexString(h4);
     }
     
     private byte [] paddingData(byte [] data)
@@ -45,7 +43,7 @@ public class Hash2 {
         int panjangData = data.length;
         int panjangSisa = data.length % 64;
         
-        int panjangPadding = 0;
+        int panjangPadding;
         if ((64 - panjangSisa >= 9)) {
             panjangPadding = 64 - panjangSisa;
         }
@@ -56,7 +54,7 @@ public class Hash2 {
         byte [] dataPadding = new byte[panjangPadding];
         dataPadding[0] = (byte) 0x80;
         
-        int panjangBit = panjangData * 8;
+        long panjangBit = panjangData * 8;
         
         for(int i = 0; i < 8; i++)
         {
@@ -66,14 +64,14 @@ public class Hash2 {
         byte [] hasil = new byte[panjangData + panjangPadding];
         System.arraycopy(data, 0, hasil, 0, panjangData);
         System.arraycopy(dataPadding, 0, hasil, panjangData, panjangPadding);
-        System.err.println(this.bytesToHexString(data));
+        System.err.println(this.bytesToHexString(dataPadding));
         return hasil;
     }
     
     private void blockProcessing(byte [] chunk)
     {
-        boolean [] chunkBoolean = Tools.convertToBoolArray(chunk);
         int [] words = new int[80];
+        System.err.println("chunk[] = " + bytesToHexString(chunk));
         
         // pecah 1 chunk jadi 16 word dari word 0 - 15
         for(int i = 0; i < 16; i++)
@@ -84,6 +82,7 @@ public class Hash2 {
                 temp = (chunk[i * 4 + j] & 0x000000FF) << (24 - j * 8);
                 words[i] = words[i] | temp;
             }
+//            System.err.println("words [" + i + "] = " + Integer.toHexString(words[i]));
         }
         
         // Buat word dari 16 - 79
@@ -102,12 +101,12 @@ public class Hash2 {
         {
             int temp = Tools.shiftLeft(A, 5) + E + words[i] + 
             ((i < 20) ?
-                k0 + ((B & C) | ((~B) & D)): 
+                K0 + ((B & C) | ((~B) & D)): 
             (i < 40) ? 
-                k1 + (B ^ C ^ D):
+                K1 + (B ^ C ^ D):
             (i < 60)?
-                k2 + ((B & C) | (B & D) | (C & D)):
-                k3 + (B ^ C ^ D));
+                K2 + ((B & C) | (B & D) | (C & D)):
+                K3 + (B ^ C ^ D));
             
             E = D;
             D = C;
@@ -121,11 +120,18 @@ public class Hash2 {
         h2 += C;
         h3 += D;
         h4 += E;
+        
+        System.out.println("H0:" + Integer.toHexString(h0));
+        System.out.println("H1:" + Integer.toHexString(h1));
+        System.out.println("H2:" + Integer.toHexString(h2));
+        System.out.println("H3:" + Integer.toHexString(h3));
+        System.out.println("H4:" + Integer.toHexString(h4));
     }
     
     public static void main(String[] args) {
         Hash2 hash = new Hash2();
-        hash.sha1sum("a".getBytes());
+//        System.err.println(hash.sha1sum("a".getBytes()));
+        System.err.println(hash.sha1sum("abcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyz".getBytes()));
     }
     
     public String bytesToHexString(byte[] bytes) {
@@ -137,5 +143,37 @@ public class Hash2 {
             hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
         return new String(hexChars);
+    }
+    
+    private String integerToHexString(int data)
+    {
+        String temp = Integer.toHexString(data);
+        switch(temp.length())
+        {
+            case 1:
+                temp = "0000000" + temp;
+                break;
+            case 2:
+                temp = "000000" + temp;
+                break;
+            case 3:
+                temp = "00000" + temp;
+                break;
+            case 4:
+                temp = "0000" + temp;
+                break;
+            case 5:
+                temp = "000" + temp;
+                break;
+            case 6:
+                temp = "00" + temp;
+                break;
+            case 7:
+                temp = "0" + temp;
+                break;
+            default:
+                temp = temp;
+        }
+        return temp;
     }
 }

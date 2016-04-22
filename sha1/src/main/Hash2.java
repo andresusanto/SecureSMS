@@ -35,7 +35,7 @@ public class Hash2 {
             this.blockProcessing(chunk);
         }
         
-        return integerToHexString(h0) + integerToHexString(h1) + integerToHexString(h2) + integerToHexString(h3) + integerToHexString(h4);
+        return Tools.integerToHexString(h0) + Tools.integerToHexString(h1) + Tools.integerToHexString(h2) + Tools.integerToHexString(h3) + Tools.integerToHexString(h4);
     }
     
     private byte [] paddingData(byte [] data)
@@ -64,14 +64,14 @@ public class Hash2 {
         byte [] hasil = new byte[panjangData + panjangPadding];
         System.arraycopy(data, 0, hasil, 0, panjangData);
         System.arraycopy(dataPadding, 0, hasil, panjangData, panjangPadding);
-        System.err.println(this.bytesToHexString(dataPadding));
+        System.err.println(Tools.bytesToHexString(dataPadding));
         return hasil;
     }
     
     private void blockProcessing(byte [] chunk)
     {
         int [] words = new int[80];
-        System.err.println("chunk[] = " + bytesToHexString(chunk));
+        System.err.println("chunk[] = " + Tools.bytesToHexString(chunk));
         
         // pecah 1 chunk jadi 16 word dari word 0 - 15
         for(int i = 0; i < 16; i++)
@@ -132,48 +132,5 @@ public class Hash2 {
         Hash2 hash = new Hash2();
 //        System.err.println(hash.sha1sum("a".getBytes()));
         System.err.println(hash.sha1sum("abcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyz".getBytes()));
-    }
-    
-    public String bytesToHexString(byte[] bytes) {
-        char[] hexArray = "0123456789ABCDEF".toCharArray();
-        char[] hexChars = new char[bytes.length * 2];
-        for ( int j = 0; j < bytes.length; j++ ) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars);
-    }
-    
-    private String integerToHexString(int data)
-    {
-        String temp = Integer.toHexString(data);
-        switch(temp.length())
-        {
-            case 1:
-                temp = "0000000" + temp;
-                break;
-            case 2:
-                temp = "000000" + temp;
-                break;
-            case 3:
-                temp = "00000" + temp;
-                break;
-            case 4:
-                temp = "0000" + temp;
-                break;
-            case 5:
-                temp = "000" + temp;
-                break;
-            case 6:
-                temp = "00" + temp;
-                break;
-            case 7:
-                temp = "0" + temp;
-                break;
-            default:
-                temp = temp;
-        }
-        return temp;
     }
 }

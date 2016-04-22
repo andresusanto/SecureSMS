@@ -13,6 +13,47 @@ import java.util.Random;
 
 public class Tools {
     
+    public static String bytesToHexString(byte[] bytes) {
+        char[] hexArray = "0123456789ABCDEF".toCharArray();
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+    
+    public static String integerToHexString(int data)
+    {
+        String temp = Integer.toHexString(data);
+        switch(temp.length())
+        {
+            case 1:
+                temp = "0000000" + temp;
+                break;
+            case 2:
+                temp = "000000" + temp;
+                break;
+            case 3:
+                temp = "00000" + temp;
+                break;
+            case 4:
+                temp = "0000" + temp;
+                break;
+            case 5:
+                temp = "000" + temp;
+                break;
+            case 6:
+                temp = "00" + temp;
+                break;
+            case 7:
+                temp = "0" + temp;
+                break;
+        }
+        return temp;
+    }
+    
     public static byte [] getShuffled(String strSeed, byte [] data)
     {
         // bentuk seed untuk random

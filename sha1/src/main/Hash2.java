@@ -12,18 +12,33 @@ import object.Word;
  * @author akhfa
  */
 public class Hash2 {
-    private static final int h0 = 0x67452301;
-    private static final int h1 = 0xEFCDAB89;
-    private static final int h2 = 0x98BADCFE;
-    private static final int h3 = 0x10325476;
-    private static final int h4 = 0xC3D2E1F0;
+    private int h0 = 0x67452301;
+    private int h1 = 0xEFCDAB89;
+    private int h2 = 0x98BADCFE;
+    private int h3 = 0x10325476;
+    private int h4 = 0xC3D2E1F0;
     
     private static final int k0 = 0x5A827999;
     private static final int k1 = 0x6ED9EBA1;
     private static final int k2 = 0x8F1BBCDC;
     private static final int k3 = 0xCA62C1D6;
     
-    int A, B, C, D, E;
+    int A, B, C, D, E, F;
+    
+    public String sha1sum(byte [] data)
+    {
+        byte [] data_64_byte = this.paddingData(data);
+        int chunkCounter = data_64_byte.length / 64;
+        byte [] chunk = new byte[64];
+        
+        for(int i = 0; i < chunkCounter; i++)
+        {
+            System.arraycopy(data_64_byte, 64 * i, chunk, 0, 64);
+            this.blockProcessing(chunk);
+        }
+        
+        return Integer.toHexString(h0) + Integer.toHexString(h1) + Integer.toHexString(h2) + Integer.toHexString(h3);
+    }
     
     private byte [] paddingData(byte [] data)
     {
@@ -58,26 +73,59 @@ public class Hash2 {
     private void blockProcessing(byte [] chunk)
     {
         boolean [] chunkBoolean = Tools.convertToBoolArray(chunk);
-        Word [] words = new Word[80];
+        int [] words = new int[80];
         
         // pecah 1 chunk jadi 16 word dari word 0 - 15
         for(int i = 0; i < 16; i++)
         {
-            boolean [] word = new boolean[32];
-            System.arraycopy(chunkBoolean, i * Word.WORD_SIZE, word, 0, Word.WORD_SIZE);
+            int temp = 0;
+            for(int j = 0; j < 4; j++)
+            {
+                temp = (chunk[i * 4 + j] & 0x000000FF) << (24 - j * 8);
+                words[i] = words[i] | temp;
+            }
         }
         
         // Buat word dari 16 - 79
         for(int i = 16; i < 80; i++)
         {
-            Word newWord = words[i - 3].xor(words[i - 8]).xor(words[i-14]).xor(words[i-16]).rotateLeft(1);
-            words [i] = newWord;
+            words[i] = Tools.shiftLeft(words[i - 3] ^ words[i - 8] ^ words[i - 14] ^ words[i - 16], 1);
         }
+        
+        A = h0;
+        B = h1;
+        C = h2;
+        D = h3;
+        E = h4;
+        
+        for(int i = 0; i < 80; i++)
+        {
+            int temp = Tools.shiftLeft(A, 5) + E + words[i] + 
+            ((i < 20) ?
+                k0 + ((B & C) | ((~B) & D)): 
+            (i < 40) ? 
+                k1 + (B ^ C ^ D):
+            (i < 60)?
+                k2 + ((B & C) | (B & D) | (C & D)):
+                k3 + (B ^ C ^ D));
+            
+            E = D;
+            D = C;
+            C = Tools.shiftLeft(B, 30);
+            B = A;
+            A = temp;
+        }
+        
+        h0 += A;
+        h1 += B;
+        h2 += C;
+        h3 += D;
+        h4 += E;
     }
     
     public static void main(String[] args) {
         Hash2 hash = new Hash2();
-        hash.paddingData("a".getBytes());
+        hash.sha1sum("a".getBytes());
     }
     
     public String bytesToHexString(byte[] bytes) {

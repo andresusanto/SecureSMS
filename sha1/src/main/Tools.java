@@ -66,6 +66,11 @@ public class Tools {
         return inputbit;
     }
     
+    public static int shiftLeft(int value, int bits) {
+        int q = (value << bits) | (value >>> (32 - bits));
+        return q;
+    }
+    
     /**
      * Melakukan bit shift terhadap array of byte
      * @param input array of byte yang akan di shift
@@ -145,6 +150,17 @@ public class Tools {
             data[i] = 0;
             for(int j=0; j<8; j++)
                 data[i] += ((bool.get(i*8+j)? 1:0) << (7-j));
+        }
+        return data;
+    }
+    
+    public static byte [] boolToByte(boolean[] bool)
+    {
+        byte[] data = new byte[(int)bool.length/8];
+        for(int i=0; i<data.length; i++) {
+            data[i] = 0;
+            for(int j=0; j<8; j++)
+                data[i] += ((bool[i*8+j]? 1:0) << (7-j));
         }
         return data;
     }

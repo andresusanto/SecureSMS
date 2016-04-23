@@ -13,6 +13,7 @@ import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,9 +23,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 
 import id.ac.itb.securesms.R;
+import id.ac.itb.securesms.engine.ECC;
+import id.ac.itb.securesms.engine.SHA1;
 import id.ac.itb.securesms.engine.TreeCipher;
 import id.ac.itb.securesms.obj.TreeCipherBlock;
 
@@ -90,20 +94,28 @@ public class NewMessageActivity extends AppCompatActivity {
                                 // MULAI DEKRIPSI PESAN
                                 String strKey = keyText.getText().toString();
                                 Log.d("KEY", strKey);
-                                byte[] bkey = strKey.getBytes();
+                                byte[] bkey = Base64.decode(strKey,Base64.DEFAULT);
                                 TreeCipherBlock key = new TreeCipherBlock(bkey);
                                 TreeCipher cip = new TreeCipher(key);
-                                byte[] plain = messageBody.getBytes();
+                                byte[] plain = Base64.decode(messageBody,Base64.DEFAULT);
                                 TreeCipherBlock dataBlocks [] = TreeCipherBlock.build(plain);
                                 cip.encrypt(dataBlocks);
                                 byte cipher[] = TreeCipherBlock.toBytes(dataBlocks);
-                                messageBody = new String(cipher);
+                                messageBody = Base64.encodeToString(cipher, Base64.DEFAULT);
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
                         }
                         if(signatureCheck.isChecked()) {
-
+                            SHA1 sha = new SHA1();
+                            String hashed = sha.sha1sum(Base64.decode(messageBody, Base64.DEFAULT));
+                            String strKey = privateKeyText.getText().toString();
+                            BigInteger privateKey = new BigInteger(strKey);
+                            ECC ecc = new ECC();
+                            ecc.setPrivateKey(privateKey);
+                            byte[] signatureByte = ecc.sign(Base64.decode(hashed,Base64.DEFAULT));
+                            String signature = Base64.encodeToString(signatureByte,Base64.DEFAULT);
+                            messageBody = messageBody+Sms.DELIMITER+signature;
                         }
                         SmsManager sms = SmsManager.getDefault();
                         Log.d("ENC: ",messageBody);

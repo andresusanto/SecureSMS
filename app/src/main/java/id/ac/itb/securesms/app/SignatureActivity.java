@@ -10,10 +10,14 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import id.ac.itb.securesms.R;
+import id.ac.itb.securesms.engine.ECC;
+import id.ac.itb.securesms.obj.Coordinate;
 
 public class SignatureActivity extends AppCompatActivity {
-    private TextView publicKey, privateKey;
+    private TextView publicKeyText, privateKeyText;
     private Button generateKeyButton;
+    private Coordinate publicKey;
+    private ECC ecc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,13 +27,19 @@ public class SignatureActivity extends AppCompatActivity {
         toolbar.setTitle("Settings");
         setSupportActionBar(toolbar);
 
-        publicKey = (TextView) findViewById(R.id.publicKeyView);
-        privateKey = (TextView) findViewById(R.id.privateKeyView);
+        ecc = new ECC();
+        publicKey = ecc.generatePublic();
+        publicKeyText = (TextView) findViewById(R.id.publicKeyView);
+        publicKeyText.setText(publicKey.X.toString() + "," + publicKey.Y.toString());
+        privateKeyText = (TextView) findViewById(R.id.privateKeyView);
+        privateKeyText.setText(ecc.getPrivateKey().toString());
         generateKeyButton = (Button) findViewById(R.id.generateKeyButton);
         generateKeyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // PEMBANGKITAN PUBLIC KEY + PRIVATE KEY
+                publicKey = ecc.generatePublic();
+                publicKeyText.setText(publicKey.X.toString() + "," + publicKey.Y.toString());
             }
         });
     }

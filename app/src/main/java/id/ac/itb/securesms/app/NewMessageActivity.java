@@ -1,5 +1,8 @@
 package id.ac.itb.securesms.app;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -8,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -17,9 +21,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import id.ac.itb.securesms.R;
+import id.ac.itb.securesms.engine.TreeCipher;
+import id.ac.itb.securesms.obj.TreeCipherBlock;
 
 public class NewMessageActivity extends AppCompatActivity {
 
@@ -27,6 +34,7 @@ public class NewMessageActivity extends AppCompatActivity {
     private TextView msgLength;
     private EditText recepientText, messageText, keyText, privateKeyText;
     private Button sendButton;
+    private String messageBody, messageRecipient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +71,8 @@ public class NewMessageActivity extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String messageBody = messageText.getText().toString();
-                String messageRecipient = recepientText.getText().toString();
+                messageBody = messageText.getText().toString();
+                messageRecipient = recepientText.getText().toString();
                 if(messageRecipient.length()==0) {
                     Toast.makeText(v.getContext(), "Fill the recipient number!", Toast.LENGTH_SHORT).show();
                 }
@@ -77,11 +85,33 @@ public class NewMessageActivity extends AppCompatActivity {
                     }
                     else {
                         // PROSES ENKRIPSI DAN DIGITAL SIGNATURE
+                        if(encryptCheck.isChecked()) {
+                            try {
+                                // MULAI DEKRIPSI PESAN
+                                String strKey = keyText.getText().toString();
+                                Log.d("KEY", strKey);
+                                byte[] bkey = strKey.getBytes();
+                                TreeCipherBlock key = new TreeCipherBlock(bkey);
+                                TreeCipher cip = new TreeCipher(key);
+                                byte[] plain = messageBody.getBytes();
+                                TreeCipherBlock dataBlocks [] = TreeCipherBlock.build(plain);
+                                cip.encrypt(dataBlocks);
+                                byte cipher[] = TreeCipherBlock.toBytes(dataBlocks);
+                                messageBody = new String(cipher);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        if(signatureCheck.isChecked()) {
+
+                        }
+                        SmsManager sms = SmsManager.getDefault();
+                        Log.d("ENC: ",messageBody);
+                        ArrayList<String> parts = sms.divideMessage(messageBody);
+                        sms.sendMultipartTextMessage(messageRecipient, null, parts, null, null);
+                        Log.d("SMS", "Message sent: "+messageBody);
+                        Toast.makeText(v.getContext(), "Message sent", Toast.LENGTH_SHORT).show();
                     }
-                    SmsManager sms = SmsManager.getDefault();
-                    ArrayList<String> parts = sms.divideMessage(messageBody);
-                    sms.sendMultipartTextMessage(messageRecipient, null, parts, null, null);
-                    Toast.makeText(v.getContext(), "Message sent", Toast.LENGTH_SHORT).show();
                 }
             }
         });

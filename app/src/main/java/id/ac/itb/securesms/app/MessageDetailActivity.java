@@ -12,7 +12,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.IOException;
+
 import id.ac.itb.securesms.R;
+import id.ac.itb.securesms.engine.TreeCipher;
+import id.ac.itb.securesms.obj.TreeCipherBlock;
 
 public class MessageDetailActivity extends AppCompatActivity {
 
@@ -82,7 +86,19 @@ public class MessageDetailActivity extends AppCompatActivity {
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // MULAI DEKRIPSI PESAN
+                        try {
+                            // MULAI DEKRIPSI PESAN
+                            byte[] bkey = input.getText().toString().getBytes();
+                            byte[] cipher = message.getText().toString().getBytes();
+                            TreeCipherBlock key = new TreeCipherBlock(bkey);
+                            TreeCipher cip = new TreeCipher(key);
+                            TreeCipherBlock dataBlocks [] = TreeCipherBlock.build(cipher);
+                            cip.decrypt(dataBlocks);
+                            byte[] decrypt = TreeCipherBlock.toBytes(dataBlocks);
+                            message.setText(new String(decrypt));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

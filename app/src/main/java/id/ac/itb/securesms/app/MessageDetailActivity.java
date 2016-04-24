@@ -19,6 +19,7 @@ import java.math.BigInteger;
 
 import id.ac.itb.securesms.R;
 import id.ac.itb.securesms.engine.ECC;
+import id.ac.itb.securesms.engine.SHA1;
 import id.ac.itb.securesms.engine.TreeCipher;
 import id.ac.itb.securesms.obj.Coordinate;
 import id.ac.itb.securesms.obj.TreeCipherBlock;
@@ -71,7 +72,9 @@ public class MessageDetailActivity extends AppCompatActivity {
                             String[] coorPoint = publicKeyStr.split(",");
                             Coordinate publicKey = new Coordinate(new BigInteger(coorPoint[0]),new BigInteger(coorPoint[1]));
                             ECC ecc = new ECC();
-                            verified = ecc.verify(Base64.decode(splitted[0],Base64.DEFAULT),Base64.decode(splitted[1],Base64.DEFAULT),publicKey);
+                            SHA1 sha = new SHA1();
+                            String hashed = sha.sha1sum(Base64.decode(splitted[0], Base64.DEFAULT));
+                            verified = ecc.verify(Base64.decode(hashed,Base64.DEFAULT),Base64.decode(splitted[1],Base64.DEFAULT),publicKey);
                             if(verified)
                                 Toast.makeText(getApplicationContext(), "Verification succeeded", Toast.LENGTH_SHORT).show();
                             else

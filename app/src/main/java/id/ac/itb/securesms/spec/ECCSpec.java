@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.util.Random;
 
 import id.ac.itb.securesms.engine.ECC;
+import id.ac.itb.securesms.engine.SHA1;
 import id.ac.itb.securesms.engine.Tools;
 import id.ac.itb.securesms.obj.Coordinate;
 import id.ac.itb.securesms.obj.Curve;
@@ -41,7 +42,13 @@ public class ECCSpec {
         // tampilkan input
         Tools.printBytes(b, "Input");
 
-        byte signature[] = ecc.sign(b); // input dari sign bisa data, atau HASH nya
+        SHA1 sha = new SHA1();
+
+        byte[] hashed = Base64.decode(sha.sha1sum(b), Base64.DEFAULT);
+
+
+        byte signature[] = ecc.sign(hashed); // input dari sign bisa data, atau HASH nya
+        Tools.printBytes(b, "Input");
 
         // tampilkan signature
         Tools.printBytes(signature, "Signature");
@@ -52,27 +59,32 @@ public class ECCSpec {
         Tools.printBytes(signdecode, "Signature decode");
 
         // lakukan validasi signature
-        boolean isValid = ecc.verify(b, signature, publicKey);
+        sha = new SHA1();
+        boolean isValid = ecc.verify(Base64.decode(sha.sha1sum(b),Base64.DEFAULT), signature, publicKey);
         Log.d("IsValid 1?", Boolean.toString(isValid));
 
         // sekarang ubah sedikit signature
         signature[1] = (byte)((signature[1] + 12) % 256);
-        isValid = ecc.verify(b, signature, publicKey);
+        sha = new SHA1();
+        isValid = ecc.verify(Base64.decode(sha.sha1sum(b), Base64.DEFAULT), signature, publicKey);
         Log.d("IsValid 2?", Boolean.toString(isValid));
 
         // kembalikan signature
         signature[1] = (byte)((signature[1] - 12) % 256);
-        isValid = ecc.verify(b, signature, publicKey);
+        sha = new SHA1();
+        isValid = ecc.verify(Base64.decode(sha.sha1sum(b), Base64.DEFAULT), signature, publicKey);
         Log.d("IsValid 3?", Boolean.toString(isValid));
 
         // sekarang ubah sedikit pesan
         b[1] = (byte)((b[1] - 12) % 256);
-        isValid = ecc.verify(b, signature, publicKey);
+        sha = new SHA1();
+        isValid = ecc.verify(Base64.decode(sha.sha1sum(b), Base64.DEFAULT), signature, publicKey);
         Log.d("IsValid 4?", Boolean.toString(isValid));
 
         // kembalikan pesan
         b[1] = (byte)((b[1] + 12) % 256);
-        isValid = ecc.verify(b, signature, publicKey);
+        sha = new SHA1();
+        isValid = ecc.verify(Base64.decode(sha.sha1sum(b), Base64.DEFAULT), signature, publicKey);
         Log.d("IsValid 5?", Boolean.toString(isValid));
 
     }

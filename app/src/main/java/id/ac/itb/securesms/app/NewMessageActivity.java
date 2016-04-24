@@ -39,6 +39,7 @@ public class NewMessageActivity extends AppCompatActivity {
     private EditText recepientText, messageText, keyText, privateKeyText;
     private Button sendButton;
     private String messageBody, messageRecipient;
+    private DatabaseHandler db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +48,8 @@ public class NewMessageActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Compose message");
         setSupportActionBar(toolbar);
+
+        db = new DatabaseHandler(this);
 
         encryptCheck = (CheckBox) findViewById(R.id.encryptCheckBox);
         signatureCheck = (CheckBox) findViewById(R.id.signatureCheckBox);
@@ -118,11 +121,13 @@ public class NewMessageActivity extends AppCompatActivity {
                             messageBody = messageBody+Sms.DELIMITER+signature;
                         }
                         SmsManager sms = SmsManager.getDefault();
-                        Log.d("ENC: ",messageBody);
+                        Log.d("ENC: ", messageBody);
                         ArrayList<String> parts = sms.divideMessage(messageBody);
                         sms.sendMultipartTextMessage(messageRecipient, null, parts, null, null);
-                        Log.d("SMS", "Message sent: "+messageBody);
+                        Log.d("SMS", "Message sent: " + messageBody);
                         Toast.makeText(v.getContext(), "Message sent", Toast.LENGTH_SHORT).show();
+                        Sms sentSms = new Sms(messageRecipient, messageBody, null);
+                        db.addMessage(sentSms);
                     }
                 }
             }

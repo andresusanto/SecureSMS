@@ -76,9 +76,9 @@ public class MessageDetailActivity extends AppCompatActivity {
                             String hashed = sha.sha1sum(Base64.decode(splitted[0], Base64.DEFAULT));
                             verified = ecc.verify(Base64.decode(hashed,Base64.DEFAULT),Base64.decode(splitted[1],Base64.DEFAULT),publicKey);
                             if(verified)
-                                Toast.makeText(getApplicationContext(), "Verification succeeded", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Verification succeeded", Toast.LENGTH_LONG).show();
                             else
-                                Toast.makeText(getApplicationContext(), "Verification failed!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), "Verification failed!", Toast.LENGTH_LONG).show();
                         }
                     });
                     builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -111,8 +111,8 @@ public class MessageDetailActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         try {
                             // MULAI DEKRIPSI PESAN
-                            byte[] bkey = Base64.decode(input.getText().toString(),Base64.DEFAULT);
-                            byte[] cipher = Base64.decode(message.getText().toString(), Base64.DEFAULT);
+                            byte[] bkey = input.getText().toString().getBytes();
+                            byte[] cipher = message.getText().toString().getBytes();
                             TreeCipherBlock key = new TreeCipherBlock(bkey);
                             TreeCipher cip = new TreeCipher(key);
                             TreeCipherBlock dataBlocks [] = TreeCipherBlock.build(cipher);

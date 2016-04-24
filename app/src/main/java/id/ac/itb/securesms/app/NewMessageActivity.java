@@ -1,17 +1,10 @@
 package id.ac.itb.securesms.app;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.telephony.SmsManager;
 import android.text.Editable;
-import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
@@ -97,10 +90,10 @@ public class NewMessageActivity extends AppCompatActivity {
                                 // MULAI DEKRIPSI PESAN
                                 String strKey = keyText.getText().toString();
                                 Log.d("KEY", strKey);
-                                byte[] bkey = Base64.decode(strKey,Base64.DEFAULT);
+                                byte[] bkey = strKey.getBytes();//Base64.decode(strKey,Base64.DEFAULT);
                                 TreeCipherBlock key = new TreeCipherBlock(bkey);
                                 TreeCipher cip = new TreeCipher(key);
-                                byte[] plain = Base64.decode(messageBody,Base64.DEFAULT);
+                                byte[] plain = messageBody.getBytes();
                                 TreeCipherBlock dataBlocks [] = TreeCipherBlock.build(plain);
                                 cip.encrypt(dataBlocks);
                                 byte cipher[] = TreeCipherBlock.toBytes(dataBlocks);

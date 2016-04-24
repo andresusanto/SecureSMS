@@ -63,7 +63,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         // Inserting Row
         db.insert(TABLE_MESSAGES, null, values);
-//        db.close(); // Closing database connection
+        db.close(); // Closing database connection
     }
 
     // Getting All Messages
@@ -86,7 +86,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
 
-//        db.close(); // Closing database connection
+        db.close(); // Closing database connection
 
         // return message list
         return messageList;

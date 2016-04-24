@@ -64,14 +64,12 @@ public class SHA1 {
         byte [] hasil = new byte[panjangData + panjangPadding];
         System.arraycopy(data, 0, hasil, 0, panjangData);
         System.arraycopy(dataPadding, 0, hasil, panjangData, panjangPadding);
-//        System.err.println(Tools.bytesToHexString(dataPadding));
         return hasil;
     }
     
     private void blockProcessing(byte [] chunk)
     {
         int [] words = new int[80];
-//        System.err.println("chunk[] = " + Tools.bytesToHexString(chunk));
         
         // pecah 1 chunk jadi 16 word dari word 0 - 15
         for(int i = 0; i < 16; i++)
@@ -119,16 +117,5 @@ public class SHA1 {
         h2 += C;
         h3 += D;
         h4 += E;
-        
-//        System.out.println("H0:" + Integer.toHexString(h0));
-//        System.out.println("H1:" + Integer.toHexString(h1));
-//        System.out.println("H2:" + Integer.toHexString(h2));
-//        System.out.println("H3:" + Integer.toHexString(h3));
-//        System.out.println("H4:" + Integer.toHexString(h4));
     }
-    
-//    public static void main(String[] args) {
-//        SHA1 hash = new SHA1();
-//        System.err.println(hash.sha1sum("abcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyzabcdefgh1jklmnopqrstuvwxyz".getBytes()));
-//    }
 }

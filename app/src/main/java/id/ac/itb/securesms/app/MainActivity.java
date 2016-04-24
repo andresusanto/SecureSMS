@@ -10,7 +10,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,20 +20,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import id.ac.itb.securesms.R;
-import id.ac.itb.securesms.spec.ECCSpec;
-import id.ac.itb.securesms.spec.TreeCipherSpec;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private final String INBOX = "inbox";
-    private final String OUTBOX = "sent";
     private static MainActivity inst;
     private List<Sms> smsList = new ArrayList<>();
     private RecyclerView recyclerView;
@@ -120,17 +114,6 @@ public class MainActivity extends AppCompatActivity
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
         refreshInboxList();
-
-        // sampel ecc
-//        ECCSpec.testDSA();
-
-        // sampel tree cipher block
-        try {
-            TreeCipherSpec.testTreeCipher();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override

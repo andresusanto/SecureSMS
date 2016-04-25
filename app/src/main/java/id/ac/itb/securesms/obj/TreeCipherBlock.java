@@ -19,11 +19,20 @@ public class TreeCipherBlock {
 
 
     public TreeCipherBlock(byte data[]){
+        byte input[];
+        if (data.length % (BLOCK_SIZE/8) != 0){
+            int bytestoPad = (BLOCK_SIZE/8) - data.length % (BLOCK_SIZE/8);
+            input = new byte[data.length + bytestoPad];
+            System.arraycopy(data, 0, input, 0, data.length);
+        }else{
+            input = data;
+        }
+
         this.content = new boolean[BLOCK_SIZE];
 
         for (int i = 0; i < BLOCK_SIZE/8; i++){
             for (int j = 0; j < 8; j++){
-                this.content[i * 8 + j] = (((data[i] >> j) & 1) == 1);
+                this.content[i * 8 + j] = (((input[i] >> j) & 1) == 1);
             }
         }
     }

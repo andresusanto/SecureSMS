@@ -33,7 +33,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
             //this will update the UI with message
             if(messages.length!=0) {
                 MainActivity inst = MainActivity.instance();
-                inst.updateList(smsSender, smsBody);
+                inst.updateInboxList(smsSender, smsBody);
             }
         }
     }

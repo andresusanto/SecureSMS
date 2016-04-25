@@ -7,12 +7,22 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.IOException;
+import java.math.BigInteger;
 
 import id.ac.itb.securesms.R;
+import id.ac.itb.securesms.engine.ECC;
+import id.ac.itb.securesms.engine.SHA1;
+import id.ac.itb.securesms.engine.TreeCipher;
+import id.ac.itb.securesms.obj.Coordinate;
+import id.ac.itb.securesms.obj.TreeCipherBlock;
 
 public class MessageDetailActivity extends AppCompatActivity {
 
@@ -22,6 +32,7 @@ public class MessageDetailActivity extends AppCompatActivity {
 
     private TextView sender, message, smsAddress;
     private Button verify, decrypt;
+    private boolean verified;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,36 +45,52 @@ public class MessageDetailActivity extends AppCompatActivity {
         message = (TextView) findViewById(R.id.messageTextView);
         message.setText(intent.getStringExtra(BODY));
         verify = (Button) findViewById(R.id.verifyButton);
-        verify.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Context context = v.getContext();
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Insert public key");
+        String content = message.getText().toString();
+        final String[] splitted = content.split(Sms.DELIMITER);
+        if(splitted.length==1)
+            verify.setEnabled(false);
+        else
+            verify.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Context context = v.getContext();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle("Insert public key");
 
-                // Set up the input
-                final EditText input = new EditText(context);
-                // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                builder.setView(input);
+                    // Set up the input
+                    final EditText input = new EditText(context);
+                    // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+                    input.setInputType(InputType.TYPE_CLASS_TEXT);
+                    builder.setView(input);
 
-                // Set up the buttons
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // MULAI VERIFIKASI DIGITAL SIGNATURE
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
+                    // Set up the buttons
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // MULAI VERIFIKASI DIGITAL SIGNATURE
+                            String publicKeyStr = input.getText().toString();
+                            String[] coorPoint = publicKeyStr.split(",");
+                            Coordinate publicKey = new Coordinate(new BigInteger(coorPoint[0]),new BigInteger(coorPoint[1]));
+                            ECC ecc = new ECC();
+                            SHA1 sha = new SHA1();
+                            String hashed = sha.sha1sum(Base64.decode(splitted[0], Base64.DEFAULT));
+                            verified = ecc.verify(Base64.decode(hashed,Base64.DEFAULT),Base64.decode(splitted[1],Base64.DEFAULT),publicKey);
+                            if(verified)
+                                Toast.makeText(getApplicationContext(), "Verification succeeded", Toast.LENGTH_LONG).show();
+                            else
+                                Toast.makeText(getApplicationContext(), "Verification failed!", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
 
-                builder.show();
-            }
-        });
+                    builder.show();
+                }
+            });
         decrypt = (Button) findViewById(R.id.decryptButton);
         decrypt.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,7 +109,19 @@ public class MessageDetailActivity extends AppCompatActivity {
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // MULAI DEKRIPSI PESAN
+                        try {
+                            // MULAI DEKRIPSI PESAN
+                            byte[] bkey = input.getText().toString().getBytes();
+                            byte[] cipher = message.getText().toString().getBytes();
+                            TreeCipherBlock key = new TreeCipherBlock(bkey);
+                            TreeCipher cip = new TreeCipher(key);
+                            TreeCipherBlock dataBlocks [] = TreeCipherBlock.build(cipher);
+                            cip.decrypt(dataBlocks);
+                            byte[] decrypt = TreeCipherBlock.toBytes(dataBlocks);
+                            message.setText(new String(decrypt));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

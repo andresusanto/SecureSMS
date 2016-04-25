@@ -2,6 +2,8 @@ package id.ac.itb.securesms.engine;
 
 import id.ac.itb.securesms.obj.Coordinate;
 import id.ac.itb.securesms.obj.Curve;
+import id.ac.itb.securesms.spec.ECCSpec;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Random;
@@ -19,6 +21,10 @@ public class ECC {
     private Coordinate baseCoordinate;
     private BigInteger privateKey;
 
+    public ECC() {
+        this.curve = new Curve(ECCSpec.a,ECCSpec.b,ECCSpec.p,ECCSpec.n);
+        this.baseCoordinate = ECCSpec.base;
+    }
 
     public ECC (Curve curve, Coordinate base, BigInteger privateKey){
         this.curve = curve;
@@ -32,7 +38,17 @@ public class ECC {
         }
     }
 
+    public BigInteger getPrivateKey() {
+        return this.privateKey;
+    }
+
+    public void setPrivateKey(BigInteger privateKey) {
+        this.privateKey = privateKey;
+    }
+
     public Coordinate generatePublic(){
+        if(privateKey==null)
+            privateKey = ECCSpec.privateKey;
         return multiplyCoordinate(baseCoordinate, privateKey);
     }
 

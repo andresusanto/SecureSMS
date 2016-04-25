@@ -20,27 +20,25 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import id.ac.itb.securesms.R;
-import id.ac.itb.securesms.spec.ECCSpec;
-import id.ac.itb.securesms.spec.TreeCipherSpec;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private final String INBOX = "inbox";
-    private final String OUTBOX = "sent";
     private static MainActivity inst;
     private List<Sms> smsList = new ArrayList<>();
     private RecyclerView recyclerView;
     private SmsAdapter mAdapter;
+    private DatabaseHandler db;
 
-    public void refreshSmsList(String option) {
+    // refresh inbox list
+    public void refreshInboxList() {
         ContentResolver contentResolver = getContentResolver();
-        Cursor smsListCursor = contentResolver.query(Uri.parse("content://sms/"+option), null, null, null, null);
+        Cursor smsListCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
         int indexBody = smsListCursor.getColumnIndex("body");
         int indexAddress = smsListCursor.getColumnIndex("address");
         if (indexBody < 0 || !smsListCursor.moveToFirst()) return;
@@ -53,7 +51,17 @@ public class MainActivity extends AppCompatActivity
         mAdapter.notifyDataSetChanged();
     }
 
-    public void updateList(final String smsSender, final String smsBody) {
+    // refresh outbox list
+    public void refreshOutboxList() {
+        smsList.clear();
+        mAdapter.notifyDataSetChanged();
+        smsList.addAll(db.getAllMessages());
+        Collections.reverse(smsList);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    // update inbox from broadcast receiver
+    public void updateInboxList(final String smsSender, final String smsBody) {
         Sms newSms = new Sms(smsSender, smsBody, null);
         smsList.add(0,newSms);
         mAdapter.notifyDataSetChanged();
@@ -76,6 +84,8 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("SecureSMS - Inbox");
         setSupportActionBar(toolbar);
+
+        db = new DatabaseHandler(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -103,18 +113,7 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
-        refreshSmsList(INBOX);
-
-        // sampel ecc
-        ECCSpec.testDSA();
-
-        // sampel tree cipher block
-        try {
-            TreeCipherSpec.testTreeCipher();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        refreshInboxList();
     }
 
     @Override
@@ -158,11 +157,11 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_inbox) {
-            refreshSmsList(INBOX);
+            refreshInboxList();
             mAdapter.isOutbox = false;
             getSupportActionBar().setTitle("SecureSMS - Inbox");
         } else if (id == R.id.nav_outbox) {
-            refreshSmsList(OUTBOX);
+            refreshOutboxList();
             mAdapter.isOutbox = true;
             getSupportActionBar().setTitle("SecureSMS - Outbox");
         }

@@ -4,6 +4,8 @@ package id.ac.itb.securesms.app;
  * Created by Rakhmatullah Yoga S on 17/04/2016.
  */
 public class Sms {
+    public static final String DELIMITER = "\n--\n";
+
     private String address, body, datetime;
 
     public Sms() {

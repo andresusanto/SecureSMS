@@ -93,7 +93,7 @@ public class NewMessageActivity extends AppCompatActivity {
                                 byte[] bkey = strKey.getBytes();//Base64.decode(strKey,Base64.DEFAULT);
                                 TreeCipherBlock key = new TreeCipherBlock(bkey);
                                 TreeCipher cip = new TreeCipher(key);
-                                byte[] plain = messageBody.getBytes();
+                                byte[] plain = messageBody.getBytes();// Base64.decode(messageBody,Base64.DEFAULT);
                                 TreeCipherBlock dataBlocks [] = TreeCipherBlock.build(plain);
                                 cip.encrypt(dataBlocks);
                                 byte cipher[] = TreeCipherBlock.toBytes(dataBlocks);

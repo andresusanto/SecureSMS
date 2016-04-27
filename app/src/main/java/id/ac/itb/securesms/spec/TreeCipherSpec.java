@@ -47,4 +47,32 @@ public class TreeCipherSpec {
         Tools.printBytes(decrypt, "Decrypt: ");
     }
 
+    public static void tesEnkrip() throws IOException {
+        //byte[] bkey = new byte[16];
+        //new Random().nextBytes(bkey);
+
+        byte[] bkey = "COba".getBytes();
+
+        byte[] cipher = "Kemarin paman sudah datang dari desa.".getBytes();
+
+        Tools.printBytes(cipher, "PLAIN");
+
+        TreeCipherBlock key = new TreeCipherBlock(bkey);
+        TreeCipher cip = new TreeCipher(key);
+        TreeCipherBlock dataBlocks [] = TreeCipherBlock.build(cipher);
+        cip.encrypt(dataBlocks);
+
+
+        byte[] enc = TreeCipherBlock.toBytes(dataBlocks);
+        Tools.printBytes(enc, "CIPHEER");
+
+        TreeCipherBlock tes[] = TreeCipherBlock.build(enc);
+        cip = new TreeCipher(key);
+
+        cip.decrypt(tes);
+        byte[] dec = TreeCipherBlock.toBytes(tes);
+        Tools.printBytes(dec, "DEKRIP");
+
+    }
+
 }

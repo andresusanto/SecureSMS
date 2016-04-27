@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 
 import id.ac.itb.securesms.R;
 import id.ac.itb.securesms.engine.ECC;
@@ -112,13 +113,13 @@ public class MessageDetailActivity extends AppCompatActivity {
                         try {
                             // MULAI DEKRIPSI PESAN
                             byte[] bkey = input.getText().toString().getBytes();
-                            byte[] cipher = Base64.decode(message.getText().toString(), Base64.DEFAULT);
+                            byte[] cipher = Base64.decode(splitted[0], Base64.DEFAULT);
                             TreeCipherBlock key = new TreeCipherBlock(bkey);
                             TreeCipher cip = new TreeCipher(key);
                             TreeCipherBlock dataBlocks [] = TreeCipherBlock.build(cipher);
                             cip.decrypt(dataBlocks);
                             byte[] decrypt = TreeCipherBlock.toBytes(dataBlocks);
-                            message.setText(Base64.encodeToString(decrypt, Base64.DEFAULT));
+                            message.setText(new String(decrypt, StandardCharsets.UTF_8));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

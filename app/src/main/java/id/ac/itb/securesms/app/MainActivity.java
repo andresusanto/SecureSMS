@@ -20,11 +20,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import id.ac.itb.securesms.R;
+import id.ac.itb.securesms.spec.TreeCipherSpec;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -114,6 +116,12 @@ public class MainActivity extends AppCompatActivity
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         recyclerView.setAdapter(mAdapter);
         refreshInboxList();
+
+        try {
+            TreeCipherSpec.tesEnkrip();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -112,13 +112,13 @@ public class MessageDetailActivity extends AppCompatActivity {
                         try {
                             // MULAI DEKRIPSI PESAN
                             byte[] bkey = input.getText().toString().getBytes();
-                            byte[] cipher = message.getText().toString().getBytes();
+                            byte[] cipher = Base64.decode(message.getText().toString(), Base64.DEFAULT);
                             TreeCipherBlock key = new TreeCipherBlock(bkey);
                             TreeCipher cip = new TreeCipher(key);
                             TreeCipherBlock dataBlocks [] = TreeCipherBlock.build(cipher);
                             cip.decrypt(dataBlocks);
                             byte[] decrypt = TreeCipherBlock.toBytes(dataBlocks);
-                            message.setText(new String(decrypt));
+                            message.setText(Base64.encodeToString(decrypt, Base64.DEFAULT));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
